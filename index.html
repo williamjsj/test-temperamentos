@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Temperamentos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+        
+        .intro {
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .name-form {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        input[type="text"] {
+            padding: 12px 20px;
+            font-size: 18px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            width: 300px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        .question-container {
+            display: none;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .question {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #444;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        @media (max-width: 600px) {
+            .options {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .option {
+            padding: 15px;
+            background-color: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 16px;
+        }
+        
+        .option:hover {
+            background-color: #f1f3f5;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .option.selected {
+            background-color: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 5px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .results {
+            display: none;
+            animation: fadeIn 1s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .result-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .temperament-result {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .temperament-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .description {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 25px;
+            text-align: left;
+            padding: 0 20px;
+        }
+        
+        .score-display {
+            text-align: center;
+            font-size: 1.2rem;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        
+        .main-temperament {
+            font-size: 1.5rem;
+            color: #667eea;
+            margin: 10px 0;
+        }
+        
+        .secondary-temperament {
+            font-size: 1.2rem;
+            color: #764ba2;
+            margin: 10px 0;
+        }
+        
+        .restart-btn {
+            display: block;
+            margin: 30px auto;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .emoji {
+            font-size: 1.5em;
+        }
+        
+        .detailed-scores {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .score-item:last-child {
+            border-bottom: none;
+        }
+        
+        .temperament-name {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌟 Test de Temperamentos 🌟</h1>
+        <div class="intro">
+            <p>Descubre cuál es tu temperamento principal y secundario respondiendo a las siguientes preguntas.</p>
+            <p>Cada temperamento tiene sus propias características que te ayudarán a conocerte mejor.</p>
+        </div>
+
+        <div class="name-form">
+            <input type="text" id="userName" placeholder="Escribe tu nombre aquí" required>
+            <button id="startBtn">✨ Comenzar Test ✨</button>
+        </div>
+
+        <div class="test-section">
+            <div class="progress-bar">
+                <div class="progress" id="progressBar"></div>
+            </div>
+
+            <div id="questionContainer" class="question-container">
+                <div class="question" id="questionText"></div>
+                <div class="options" id="optionsContainer"></div>
+                <div class="navigation">
+                    <button id="prevBtn" style="display: none;">⬅️ Anterior</button>
+                    <button id="nextBtn" disabled>Siguiente ➡️</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="results" id="resultsSection">
+            <div class="result-header">
+                <h2>🎉 ¡Gracias por completar el test, <span id="resultName"></span>! 🎉</h2>
+                <div class="score-display">
+                    <div class="main-temperament">Temperamento Principal: <span id="mainTemperament"></span></div>
+                    <div class="secondary-temperament">Temperamento Secundario: <span id="secondaryTemperament"></span></div>
+                </div>
+                
+                <div class="detailed-scores">
+                    <h3>📊 Puntuación Detallada</h3>
+                    <div class="score-item">
+                        <span class="temperament-name">Sanguíneo ☀️:</span>
+                        <span id="sanguineoScore">0 puntos</span>
+                    </div>
+                    <div class="score-item">
+                        <span class="temperament-name">Colérico 🔥:</span>
+                        <span id="colericoScore">0 puntos</span>
+                    </div>
+                    <div class="score-item">
+                        <span class="temperament-name">Melancólico 🌙:</span>
+                        <span id="melancolicoScore">0 puntos</span>
+                    </div>
+                    <div class="score-item">
+                        <span class="temperament-name">Flemático 🧊:</span>
+                        <span id="flematicoScore">0 puntos</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mainResult" class="temperament-result">
+                <h3 class="temperament-title" id="mainTitle"></h3>
+                <p class="description" id="mainDescription"></p>
+            </div>
+
+            <div id="secondaryResult" class="temperament-result">
+                <h3 class="temperament-title" id="secondaryTitle"></h3>
+                <p class="description" id="secondaryDescription"></p>
+            </div>
+
+            <button class="restart-btn" id="restartBtn">🔄 Hacer Test de Nuevo 🔄</button>
+            
+            <div class="footer">
+                Desarrollado por William Salazar
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const startBtn = document.getElementById('startBtn');
+            const userNameInput = document.getElementById('userName');
+            const questionContainer = document.getElementById('questionContainer');
+            const questionText = document.getElementById('questionText');
+            const optionsContainer = document.getElementById('optionsContainer');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const progressBar = document.getElementById('progressBar');
+            const resultsSection = document.getElementById('resultsSection');
+            const resultName = document.getElementById('resultName');
+            const mainTemperament = document.getElementById('mainTemperament');
+            const secondaryTemperament = document.getElementById('secondaryTemperament');
+            const mainTitle = document.getElementById('mainTitle');
+            const secondaryTitle = document.getElementById('secondaryTitle');
+            const mainDescription = document.getElementById('mainDescription');
+            const secondaryDescription = document.getElementById('secondaryDescription');
+            const restartBtn = document.getElementById('restartBtn');
+            
+            // Score elements
+            const sanguineoScoreEl = document.getElementById('sanguineoScore');
+            const colericoScoreEl = document.getElementById('colericoScore');
+            const melancolicoScoreEl = document.getElementById('melancolicoScore');
+            const flematicoScoreEl = document.getElementById('flematicoScore');
+
+            // Relevant emojis for specific options
+            const getRelevantEmoji = (optionText) => {
+                const emojiMap = {
+                    // Fortalezas Sanguíneo
+                    "Animado": "😄",
+                    "Juguetón": "🎪",
+                    "Sociable": "👥",
+                    "Convincente": "🗣️",
+                    "Entusiasta": "🎉",
+                    "Enérgico": "⚡",
+                    "Activista": "✊",
+                    "Espontáneo": "🎭",
+                    "Optimista": "🌈",
+                    "Humorístico": "😂",
+                    "Encantador": "😍",
+                    "Alegre": "😁",
+                    "Inspirador": "🌟",
+                    "Cálido": "🤗",
+                    "Cordial": "🤝",
+                    "Conversador": "💬",
+                    "Vivaz": "💃",
+                    "Listo": "🧠",
+                    "Popular": "🎉",
+                    "Jovial": "🥳",
+                    
+                    // Fortalezas Colérico
+                    "Aventurero": "🗺️",
+                    "Persuasivo": "🗣️",
+                    "Decidido": "💪",
+                    "Competitivo": "🏆",
+                    "Inventivo": "💡",
+                    "Autosuficiente": "🦸",
+                    "Positivo": "👍",
+                    "Seguro": "🛡️",
+                    "Abierto": "🚪",
+                    "Dominante": "👑",
+                    "Osado": "🦁",
+                    "Confiado": "😎",
+                    "Independiente": "🦅",
+                    "Decisivo": "🔨",
+                    "Instigador": "🔥",
+                    "Tenaz": "🦾",
+                    "Líder": "👑",
+                    "Jefe": "💼",
+                    "Productivo": "📈",
+                    "Atrevido": "🦁",
+                    
+                    // Fortalezas Melancólico
+                    "Analítico": "🧐",
+                    "Persistente": "📚",
+                    "Abnegado": "🧪",
+                    "Considerado": "💎",
+                    "Respetuoso": "🎻",
+                    "Sensible": "📝",
+                    "Planificador": "🗓️",
+                    "Puntual": "⏰",
+                    "Ordenado": "📋",
+                    "Fiel": "🕊️",
+                    "Detallista": "🔍",
+                    "Culto": "🎓",
+                    "Idealista": "💭",
+                    "Introspectivo": "🌙",
+                    "Músico": "🎹",
+                    "Considerado": "❤️",
+                    "Leal": "🛡️",
+                    "Organizado": "📁",
+                    "Perfeccionista": "🎯",
+                    "Se comporta bien": "🎩",
+                    
+                    // Fortalezas Flemático
+                    "Adaptable": "😌",
+                    "Plácido": "🧘",
+                    "Sumiso": "🐢",
+                    "Controlado": "☮️",
+                    "Reservado": "🤝",
+                    "Contento": "😊",
+                    "Paciente": "⏳",
+                    "Tímido": "🙈",
+                    "Atento": "👂",
+                    "Amigable": "🙂",
+                    "Diplomático": "🕊️",
+                    "Constante": "🔁",
+                    "Inofensivo": "💤",
+                    "Humor seco": "😶",
+                    "Conciliador": "🧸",
+                    "Tolerante": "🐌",
+                    "Escucha": "☕",
+                    "Contento": "🛋️",
+                    "Permisivo": "⚖️",
+                    "Equilibrado": "🧊",
+                    
+                    // Debilidades Sanguíneo
+                    "Estridente": "⚠️",
+                    "Indisciplinado": "😤",
+                    "Repetidor": "😔",
+                    "Olvidadizo": "🤔",
+                    "Interrumpe": "😰",
+                    "Imprevisible": "🎭",
+                    "Descuidado": "😤",
+                    "Tolerante": "😶",
+                    "Iracundo": "😠",
+                    "Ingénuo": "😞",
+                    "Egocéntrico": "😅",
+                    "Hablador": "🤫",
+                    "Desorganizado": "😩",
+                    "Inconsistente": "😐",
+                    "Desordenado": "🐢",
+                    "Ostentoso": "🦥",
+                    "Emocional": "😴",
+                    "Atolondrado": "😮",
+                    "Inquieto": "🏃",
+                    "Variable": "🦊",
+                    
+                    // Debilidades Colérico
+                    "Mandón": "⚠️",
+                    "Antipático": "😤",
+                    "Resistente": "😔",
+                    "Franco": "🤔",
+                    "Impaciente": "😰",
+                    "Frío": "❄️",
+                    "Terco": "😤",
+                    "Orgulloso": "😶",
+                    "Argumentador": "😠",
+                    "Nervioso": "😞",
+                    "Adicto al trabajo": "😅",
+                    "Indiscreto": "🤫",
+                    "Dominante": "😩",
+                    "Intolerante": "😐",
+                    "Manipulador": "🐢",
+                    "Testarudo": "🦥",
+                    "Prepotente": "😴",
+                    "Malgeniado": "😮",
+                    "Precipitado": "🏃",
+                    "Astuto": "🦊",
+                    
+                    // Debilidades Melancólico
+                    "Desanimado": "⚠️",
+                    "Sin entusiasmo": "😤",
+                    "Resentido": "😔",
+                    "Exigente": "🤔",
+                    "Inseguro": "😰",
+                    "No comprometido": "❄️",
+                    "Difícil contentar": "😤",
+                    "Pesimista": "😶",
+                    "Sin motivación": "😠",
+                    "Negativo": "😞",
+                    "Distraído": "😅",
+                    "Susceptible": "🤫",
+                    "Deprimido": "😩",
+                    "Introvertido": "😐",
+                    "Moroso": "🐢",
+                    "Escéptico": "🦥",
+                    "Solitario": "😴",
+                    "Suspicaz": "😮",
+                    "Vengativo": "🏃",
+                    "Comprometedor": "🦊",
+                    
+                    // Debilidades Flemático
+                    "Soso": "⚠️",
+                    "Implacable": "😤",
+                    "Reticente": "😔",
+                    "Temeroso": "🤔",
+                    "Indeciso": "😰",
+                    "Impopular": "❄️",
+                    "Vacilante": "😤",
+                    "Insípido": "😶",
+                    "Taciturno": "😠",
+                    "Desprendido": "😞",
+                    "Ansioso": "😅",
+                    "Tímido": "🤫",
+                    "Dudoso": "😩",
+                    "Indiferente": "😐",
+                    "Quejumbroso": "🐢",
+                    "Lento": "🦥",
+                    "Perezoso": "😴",
+                    "Sin ambición": "😮",
+                    "Poca voluntad": "🏃",
+                    "Crítico": "🦊"
+                };
+                
+                return emojiMap[optionText] || "";
+            };
+
+            // Test data
+            const questions = [
+                { id: 1, text: "FORTALEZAS 1", emoji: "😊", options: ["Animado", "Aventurero", "Analítico", "Adaptable"] },
+                { id: 2, text: "FORTALEZAS 2", emoji: "😄", options: ["Juguetón", "Persuasivo", "Persistente", "Plácido"] },
+                { id: 3, text: "FORTALEZAS 3", emoji: "🤗", options: ["Sociable", "Decidido", "Abnegado", "Sumiso"] },
+                { id: 4, text: "FORTALEZAS 4", emoji: "💪", options: ["Convincente", "Competitivo", "Considerado", "Controlado"] },
+                { id: 5, text: "FORTALEZAS 5", emoji: "🌟", options: ["Entusiasta", "Inventivo", "Respetuoso", "Reservado"] },
+                { id: 6, text: "FORTALEZAS 6", emoji: "⚡", options: ["Enérgico", "Autosuficiente", "Sensible", "Contento"] },
+                { id: 7, text: "FORTALEZAS 7", emoji: "🎯", options: ["Activista", "Positivo", "Planificador", "Paciente"] },
+                { id: 8, text: "FORTALEZAS 8", emoji: "✅", options: ["Espontáneo", "Seguro", "Puntual", "Tímido"] },
+                { id: 9, text: "FORTALEZAS 9", emoji: "🌈", options: ["Optimista", "Abierto", "Ordenado", "Atento"] },
+                { id: 10, text: "FORTALEZAS 10", emoji: "🎭", options: ["Humorístico", "Dominante", "Fiel", "Amigable"] },
+                { id: 11, text: "FORTALEZAS 11", emoji: "✨", options: ["Encantador", "Osado", "Detallista", "Diplomático"] },
+                { id: 12, text: "FORTALEZAS 12", emoji: "🥳", options: ["Alegre", "Confiado", "Culto", "Constante"] },
+                { id: 13, text: "FORTALEZAS 13", emoji: "🚀", options: ["Inspirador", "Independiente", "Idealista", "Inofensivo"] },
+                { id: 14, text: "FORTALEZAS 14", emoji: "🔥", options: ["Cálido", "Decisivo", "Introspectivo", "Humor seco"] },
+                { id: 15, text: "FORTALEZAS 15", emoji: "🎵", options: ["Cordial", "Instigador", "Músico", "Conciliador"] },
+                { id: 16, text: "FORTALEZAS 16", emoji: "🤝", options: ["Conversador", "Tenaz", "Considerado", "Tolerante"] },
+                { id: 17, text: "FORTALEZAS 17", emoji: "👑", options: ["Vivaz", "Líder", "Leal", "Escucha"] },
+                { id: 18, text: "FORTALEZAS 18", emoji: "🏆", options: ["Listo", "Jefe", "Organizado", "Contento"] },
+                { id: 19, text: "FORTALEZAS 19", emoji: "📈", options: ["Popular", "Productivo", "Perfeccionista", "Permisivo"] },
+                { id: 20, text: "FORTALEZAS 20", emoji: "⚖️", options: ["Jovial", "Atrevido", "Se comporta bien", "Equilibrado"] },
+                { id: 21, text: "DEBILIDADES 21", emoji: "⚠️", options: ["Estridente", "Mandón", "Desanimado", "Soso"] },
+                { id: 22, text: "DEBILIDADES 22", emoji: "😤", options: ["Indisciplinado", "Antipático", "Sin entusiasmo", "Implacable"] },
+                { id: 23, text: "DEBILIDADES 23", emoji: "😔", options: ["Repetidor", "Resistente", "Resentido", "Reticente"] },
+                { id: 24, text: "DEBILIDADES 24", emoji: "🤔", options: ["Olvidadizo", "Franco", "Exigente", "Temeroso"] },
+                { id: 25, text: "DEBILIDADES 25", emoji: "😰", options: ["Interrumpe", "Impaciente", "Inseguro", "Indeciso"] },
+                { id: 26, text: "DEBILIDADES 26", emoji: "❄️", options: ["Imprevisible", "Frío", "No comprometido", "Impopular"] },
+                { id: 27, text: "DEBILIDADES 27", emoji: "😤", options: ["Descuidado", "Terco", "Difícil contentar", "Vacilante"] },
+                { id: 28, text: "DEBILIDADES 28", emoji: "😶", options: ["Tolerante", "Orgulloso", "Pesimista", "Insípido"] },
+                { id: 29, text: "DEBILIDADES 29", emoji: "😠", options: ["Iracundo", "Argumentador", "Sin motivación", "Taciturno"] },
+                { id: 30, text: "DEBILIDADES 30", emoji: "😞", options: ["Ingénuo", "Nervioso", "Negativo", "Desprendido"] },
+                { id: 31, text: "DEBILIDADES 31", emoji: "😅", options: ["Egocéntrico", "Adicto al trabajo", "Distraído", "Ansioso"] },
+                { id: 32, text: "DEBILIDADES 32", emoji: "🤫", options: ["Hablador", "Indiscreto", "Susceptible", "Tímido"] },
+                { id: 33, text: "DEBILIDADES 33", emoji: "😩", options: ["Desorganizado", "Dominante", "Deprimido", "Dudoso"] },
+                { id: 34, text: "DEBILIDADES 34", emoji: "😐", options: ["Inconsistente", "Intolerante", "Introvertido", "Indiferente"] },
+                { id: 35, text: "DEBILIDADES 35", emoji: "🐢", options: ["Desordenado", "Manipulador", "Moroso", "Quejumbroso"] },
+                { id: 36, text: "DEBILIDADES 36", emoji: "🦥", options: ["Ostentoso", "Testarudo", "Escéptico", "Lento"] },
+                { id: 37, text: "DEBILIDADES 37", emoji: "😴", options: ["Emocional", "Prepotente", "Solitario", "Perezoso"] },
+                { id: 38, text: "DEBILIDADES 38", emoji: "😮", options: ["Atolondrado", "Malgeniado", "Suspicaz", "Sin ambición"] },
+                { id: 39, text: "DEBILIDADES 39", emoji: "🏃", options: ["Inquieto", "Precipitado", "Vengativo", "Poca voluntad"] },
+                { id: 40, text: "DEBILIDADES 40", emoji: "🦊", options: ["Variable", "Astuto", "Comprometedor", "Crítico"] }
+            ];
+
+            // Temperament descriptions
+            const temperamentInfo = {
+                sanguineo: {
+                    name: "Sanguíneo",
+                    emoji: "☀️",
+                    description: "El temperamento sanguíneo se caracteriza por ser extrovertido, sociable y optimista. Son personas entusiastas y carismáticas que disfrutan de la interacción social. Sin embargo, su naturaleza impulsiva y su tendencia a la distracción pueden hacerlos desorganizados e inestables en sus proyectos y emociones."
+                },
+                colerico: {
+                    name: "Colérico",
+                    emoji: "🔥",
+                    description: "El colérico es un líder nato, ambicioso y práctico. Su determinación y enfoque en los objetivos los hacen excelentes para resolver problemas y tomar decisiones. No obstante, pueden ser impacientes, dominantes y explosivos, lo que a veces los lleva a parecer insensibles a los sentimientos de los demás."
+                },
+                melancolico: {
+                    name: "Melancólico",
+                    emoji: "🌙",
+                    description: "Las personas con temperamento melancólico son analíticas, sensibles y creativas. Su profundo sentido del detalle y lealtad los convierte en amigos y compañeros confiables. Por otro lado, pueden ser propensos al pesimismo, la introspección excesiva y el perfeccionismo, lo que a menudo los lleva a la autoexigencia y a la melancolía."
+                },
+                flematico: {
+                    name: "Flemático",
+                    emoji: "🧊",
+                    description: "El flemático es conocido por su naturaleza tranquila, paciente y estable. Son mediadores por excelencia, capaces de manejar conflictos con calma y diplomacia. A pesar de su serenidad, su falta de motivación y tendencia a la indecisión y la pasividad pueden hacer que les cueste iniciar proyectos o mostrar sus emociones."
+                }
+            };
+
+            // State
+            let currentQuestionIndex = 0;
+            let userAnswers = [];
+            let userName = "";
+
+            // Event Listeners
+            startBtn.addEventListener('click', startTest);
+            nextBtn.addEventListener('click', goToNextQuestion);
+            prevBtn.addEventListener('click', goToPreviousQuestion);
+            restartBtn.addEventListener('click', restartTest);
+
+            // Functions
+            function startTest() {
+                userName = userNameInput.value.trim();
+                if (!userName) {
+                    alert("Por favor, escribe tu nombre para comenzar el test.");
+                    return;
+                }
+                
+                document.querySelector('.name-form').style.display = 'none';
+                questionContainer.style.display = 'block';
+                loadQuestion(currentQuestionIndex);
+            }
+
+            function loadQuestion(index) {
+                const question = questions[index];
+                questionText.innerHTML = `<span class="emoji">${question.emoji}</span> ${question.text}`;
+                
+                optionsContainer.innerHTML = '';
+                question.options.forEach((option, i) => {
+                    const optionLetter = String.fromCharCode(97 + i); // a, b, c, d
+                    const emoji = getRelevantEmoji(option);
+                    const optionElement = document.createElement('div');
+                    optionElement.className = 'option';
+                    
+                    if (emoji) {
+                        optionElement.innerHTML = `<span class="emoji">${emoji}</span> ${optionLetter}) ${option}`;
+                    } else {
+                        optionElement.innerHTML = `${optionLetter}) ${option}`;
+                    }
+                    
+                    optionElement.dataset.index = i;
+                    
+                    if (userAnswers[index] === i) {
+                        optionElement.classList.add('selected');
+                    }
+                    
+                    optionElement.addEventListener('click', () => {
+                        document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+                        optionElement.classList.add('selected');
+                        userAnswers[index] = i;
+                        nextBtn.disabled = false;
+                    });
+                    
+                    optionsContainer.appendChild(optionElement);
+                });
+                
+                // Update navigation buttons
+                if (index === 0) {
+                    prevBtn.style.display = 'none';
+                } else {
+                    prevBtn.style.display = 'block';
+                }
+                
+                if (index === questions.length - 1) {
+                    nextBtn.textContent = 'Finalizar Test 🎯';
+                } else {
+                    nextBtn.textContent = 'Siguiente ➡️';
+                }
+                
+                // Update progress bar
+                const progress = ((index + 1) / questions.length) * 100;
+                progressBar.style.width = `${progress}%`;
+            }
+
+            function goToNextQuestion() {
+                if (userAnswers[currentQuestionIndex] === undefined) {
+                    alert("Por favor, selecciona una opción antes de continuar.");
+                    return;
+                }
+                
+                currentQuestionIndex++;
+                
+                if (currentQuestionIndex >= questions.length) {
+                    showResults();
+                } else {
+                    loadQuestion(currentQuestionIndex);
+                }
+            }
+
+            function goToPreviousQuestion() {
+                currentQuestionIndex--;
+                loadQuestion(currentQuestionIndex);
+            }
+
+            function showResults() {
+                // Calculate scores - summing all responses for each temperament
+                const scores = {
+                    sanguineo: 0,
+                    colerico: 0,
+                    melancolico: 0,
+                    flematico: 0
+                };
+                
+                // Count all selections for each temperament
+                userAnswers.forEach(answer => {
+                    switch(answer) {
+                        case 0: scores.sanguineo++; break;
+                        case 1: scores.colerico++; break;
+                        case 2: scores.melancolico++; break;
+                        case 3: scores.flematico++; break;
+                    }
+                });
+                
+                // Display detailed scores
+                sanguineoScoreEl.textContent = `${scores.sanguineo} puntos`;
+                colericoScoreEl.textContent = `${scores.colerico} puntos`;
+                melancolicoScoreEl.textContent = `${scores.melancolico} puntos`;
+                flematicoScoreEl.textContent = `${scores.flematico} puntos`;
+                
+                // Sort temperaments by score
+                const sortedTemperaments = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+                
+                // Display results
+                resultName.textContent = userName;
+                
+                // Main temperament
+                const mainTemp = sortedTemperaments[0][0];
+                mainTemperament.textContent = `${temperamentInfo[mainTemp].name} ${temperamentInfo[mainTemp].emoji} (${sortedTemperaments[0][1]} puntos)`;
+                mainTitle.innerHTML = `${temperamentInfo[mainTemp].emoji} ${temperamentInfo[mainTemp].name} ${temperamentInfo[mainTemp].emoji}`;
+                mainDescription.textContent = temperamentInfo[mainTemp].description;
+                
+                // Secondary temperament
+                const secondaryTemp = sortedTemperaments[1][0];
+                secondaryTemperament.textContent = `${temperamentInfo[secondaryTemp].name} ${temperamentInfo[secondaryTemp].emoji} (${sortedTemperaments[1][1]} puntos)`;
+                secondaryTitle.innerHTML = `${temperamentInfo[secondaryTemp].emoji} ${temperamentInfo[secondaryTemp].name} ${temperamentInfo[secondaryTemp].emoji}`;
+                secondaryDescription.textContent = temperamentInfo[secondaryTemp].description;
+                
+                // Hide question container and show results
+                questionContainer.style.display = 'none';
+                resultsSection.style.display = 'block';
+                
+                // Scroll to top
+                window.scrollTo(0, 0);
+            }
+
+            function restartTest() {
+                // Reset state
+                currentQuestionIndex = 0;
+                userAnswers = [];
+                userName = "";
+                
+                // Reset UI
+                userNameInput.value = "";
+                document.querySelector('.name-form').style.display = 'block';
+                questionContainer.style.display = 'none';
+                resultsSection.style.display = 'none';
+                progressBar.style.width = '0%';
+                
+                // Scroll to top
+                window.scrollTo(0, 0);
+            }
+        });
+    </script>
+</body>
+</html>
